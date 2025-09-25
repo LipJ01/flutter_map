@@ -64,6 +64,8 @@ class MapInteractiveViewerState extends State<MapInteractiveViewer>
   bool _dragMode = false;
   int _gestureWinner = MultiFingerGesture.none;
   int _pointerCounter = 0;
+  /// Debounce flag to ensure setState is only scheduled once per frame.
+  bool _pendingMapStateChange = false;
   bool _isListeningForInterruptions = false;
 
   var _rotationStarted = false;
@@ -179,7 +181,13 @@ class MapInteractiveViewerState extends State<MapInteractiveViewer>
   /// Rebuilds the map widget
   void onMapStateChange() {
     _updateKeyboardPanAnimationZoomLevel();
-    setState(() {});
+    if (!mounted) return;
+    if (_pendingMapStateChange) return;
+    _pendingMapStateChange = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _pendingMapStateChange = false;
+      if (mounted) setState(() {});
+    });
   }
 
   /// Handles key down events to detect if one of the trigger keys got pressed.
