@@ -64,6 +64,7 @@ class MapInteractiveViewerState extends State<MapInteractiveViewer>
   bool _dragMode = false;
   int _gestureWinner = MultiFingerGesture.none;
   int _pointerCounter = 0;
+
   /// Debounce flag to ensure setState is only scheduled once per frame.
   bool _pendingMapStateChange = false;
   bool _isListeningForInterruptions = false;
