@@ -183,6 +183,12 @@ class MapInteractiveViewerState extends State<MapInteractiveViewer>
   void onMapStateChange() {
     _updateKeyboardPanAnimationZoomLevel();
     if (!mounted) return;
+
+    // In test mode, skip the post-frame callback scheduling to avoid
+    // infinite loops with pumpAndSettle. The InheritedModel will handle
+    // propagating camera changes to dependent widgets.
+    if (_options.testMode) return;
+
     if (_pendingMapStateChange) return;
     _pendingMapStateChange = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {

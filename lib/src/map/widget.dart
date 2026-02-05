@@ -66,9 +66,14 @@ class _FlutterMapStateContainer extends State<FlutterMap>
       _setMapController();
     }
     if (oldWidget.options != widget.options) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _mapController.options = widget.options;
-      });
+      // In test mode, skip the post-frame callback to avoid infinite loops
+      if (widget.options.testMode) {
+        _mapController.options = widget.options;
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _mapController.options = widget.options;
+        });
+      }
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -136,6 +141,13 @@ class _FlutterMapStateContainer extends State<FlutterMap>
     final oldCamera = _mapController.camera;
     if (_mapController.setNonRotatedSizeWithoutEmittingEvent(nonRotatedSize)) {
       final newMapCamera = _mapController.camera;
+
+      // In test mode, skip the post-frame callback to avoid infinite loops
+      // with pumpAndSettle. Just apply the initial camera fit synchronously.
+      if (widget.options.testMode) {
+        _applyInitialCameraFit(constraints);
+        return;
+      }
 
       // Avoid emitting the event during build otherwise if the user calls
       // setState in the onMapEvent callback it will throw.

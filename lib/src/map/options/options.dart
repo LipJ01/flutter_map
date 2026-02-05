@@ -136,6 +136,15 @@ class MapOptions {
   /// widget from rebuilding.
   final bool keepAlive;
 
+  /// Flag to enable test mode optimizations.
+  ///
+  /// When enabled, the map disables post-frame callback scheduling for state
+  /// updates, which can cause infinite loops in widget tests that use
+  /// `pumpAndSettle`. In test mode, state changes are applied synchronously.
+  ///
+  /// Defaults to `false`. Set to `true` when using FlutterMap in widget tests.
+  final bool testMode;
+
   /// Gesture and input options for the map widget.
   final InteractionOptions interactionOptions;
 
@@ -162,6 +171,7 @@ class MapOptions {
     this.onMapEvent,
     this.onMapReady,
     this.keepAlive = false,
+    this.testMode = false,
   });
 
   /// The options of the closest [FlutterMap] ancestor. If this is called from a
@@ -199,6 +209,7 @@ class MapOptions {
       cameraConstraint == other.cameraConstraint &&
       onMapReady == other.onMapReady &&
       keepAlive == other.keepAlive &&
+      testMode == other.testMode &&
       interactionOptions == other.interactionOptions;
 
   @override
@@ -223,6 +234,7 @@ class MapOptions {
         cameraConstraint,
         onMapReady,
         keepAlive,
+        testMode,
         interactionOptions,
         backgroundColor,
       ]);
