@@ -113,8 +113,10 @@ class MarkerLayer extends StatelessWidget {
 
             // Repeat over all worlds (<--||-->) until culling determines that
             // that marker is out of view, and therefore all further markers in
-            // that direction will also be
-            if (worldWidth == 0) continue;
+            // that direction will also be.
+            // Note: Skip world-wrapping when culling is disabled, as the loops
+            // rely on culling to terminate (no culling = infinite loop).
+            if (worldWidth == 0 || !enableViewportCulling) continue;
             for (double shift = -worldWidth;; shift -= worldWidth) {
               final additional = getPositioned(shift);
               if (additional == null) break;
