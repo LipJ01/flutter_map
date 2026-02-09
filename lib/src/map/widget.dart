@@ -1,3 +1,4 @@
+import 'dart:async' show scheduleMicrotask;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/gestures/map_interactive_viewer.dart';
@@ -56,8 +57,15 @@ class _FlutterMapStateContainer extends State<FlutterMap>
     super.initState();
     _setMapController();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => widget.options.onMapReady?.call());
+    if (widget.options.testMode) {
+      // In test mode, use scheduleMicrotask so onMapReady fires after initState
+      // completes (avoiding Riverpod "modified during build" errors) but before
+      // requiring a full frame pump.
+      scheduleMicrotask(() => widget.options.onMapReady?.call());
+    } else {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => widget.options.onMapReady?.call());
+    }
   }
 
   @override
